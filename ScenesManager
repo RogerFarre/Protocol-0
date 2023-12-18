@@ -1,0 +1,88 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+
+public class ScenesManager : MonoBehaviour
+{
+    public PlayerChange player;
+    private static ScenesManager instance;
+    private float skin_value = 1;
+    private GameObject skin1;
+    private GameObject skin2;
+    private GameObject skin3;
+
+    private void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(this.gameObject);
+        }
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+    void Start()
+    {
+        skin1 = GameObject.Find("Skin1");
+        skin2 = GameObject.Find("Skin2");
+        skin3 = GameObject.Find("Skin3");
+
+        if (skin1 != null && skin2 != null && skin3 != null)
+        {
+            skin1.SetActive(true);
+            skin2.SetActive(false);
+            skin3.SetActive(false);
+        }
+    }
+    public void ChangeScene(string sceneName) 
+    {
+        SceneManager.LoadScene(sceneName);
+    }
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (scene.name == "Game" || scene.name == "Start" || scene.name == "Win" || scene.name == "Loose")
+        {
+            Swap(skin_value);
+        }
+    }
+    public void Exit()
+    {
+        Application.Quit();
+    }
+    public void SkinChange(float number)
+    {
+        skin_value = number;
+    }
+    public void Swap(float skin_value)
+    {
+        skin1 = GameObject.Find("Skin1");
+        skin2 = GameObject.Find("Skin2");
+        skin3 = GameObject.Find("Skin3");
+        
+        if (skin1 != null && skin2 != null && skin3 != null)
+        {
+            if (skin_value == 1)
+            {
+                skin1.SetActive(true);
+                skin2.SetActive(false);
+                skin3.SetActive(false);
+            }
+            else if (skin_value == 2)
+            {
+                skin1.SetActive(false);
+                skin2.SetActive(true);
+                skin3.SetActive(false);
+            }
+            else if (skin_value == 3)
+            {
+                skin1.SetActive(false);
+                skin2.SetActive(false);
+                skin3.SetActive(true);
+            }
+        }
+    }
+}
