@@ -1,0 +1,173 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+[RequireComponent(typeof(Rigidbody), typeof(BoxCollider))]
+
+public class PlayerMovement : MonoBehaviour
+{
+    [SerializeField] public Rigidbody _rigidbody;
+    [SerializeField] private FixedJoystick _joystick;
+    [SerializeField] public Animator _animator1;
+    [SerializeField] public Animator _animator2;
+    [SerializeField] public Animator _animator3;
+    [SerializeField] public GameObject handle;
+    
+    [SerializeField] private float _moveSpeed;
+    [SerializeField] private float _pushForce;
+    [SerializeField] public Rigidbody rival;
+
+    public float jumpforce;
+    private bool isCollidingWithRival = false;
+    private bool canjump = false;
+    private float jumpOrigin = 1;
+
+    private void Update() 
+    {
+        _rigidbody.velocity = new Vector3(_joystick.Horizontal * _moveSpeed, _rigidbody.velocity.y, _joystick.Vertical * _moveSpeed);
+        handle.transform.localRotation = Quaternion.Euler(0, 0, -transform.eulerAngles.y);
+
+        if (_joystick.Horizontal != 0 || _joystick.Vertical != 0)
+        {
+            transform.rotation = Quaternion.LookRotation(_rigidbody.velocity);
+            _animator1.SetBool("camina", true);
+            _animator2.SetBool("camina", true);
+            _animator3.SetBool("camina", true);
+        }
+        else 
+        {
+            _animator1.SetBool("camina", false);
+            _animator2.SetBool("camina", false);
+            _animator3.SetBool("camina", false);
+        }
+    }
+
+   public void saltar()
+    {
+        if (canjump)
+        {
+            var angle = transform.rotation.eulerAngles.y;
+            angle = (angle + 180) % 360 - 180;
+            float currentJumpOrigin = jumpOrigin;
+
+            Vector3 _jumpforce = Vector3.zero;
+            Vector3 _forwardForce = Vector3.zero;
+
+            switch (jumpOrigin)
+            {
+                case 1:
+                    if (angle > 140 || angle < -120)
+                    {
+                        print("Jump1");
+                        _jumpforce = transform.up * 20;
+                        _forwardForce = transform.forward * 50;
+                    }
+                    break;
+
+                case 2:
+                    if (angle > -45 && angle < 60)
+                    {
+                        print("Jump2");
+                        _jumpforce = transform.up * 20;
+                        _forwardForce = transform.forward * 50;
+                    }
+                    break;
+
+                case 3:
+                    if (angle > -90 && angle < -25)
+                    {
+                        print("Jump3");
+                        _jumpforce = transform.up * 15;
+                        _forwardForce = transform.forward * 50;
+                    }
+                    break;
+
+                case 4:
+                    if (angle > 110 && angle < 170)
+                    {
+                        print("Jump4");
+                        _jumpforce = transform.up * 15;
+                        _forwardForce = transform.forward * 50;
+                    }
+                    break;
+
+                default:
+                    _jumpforce = Vector3.up * jumpforce;
+                    break;
+            }
+
+            if (currentJumpOrigin == jumpOrigin) 
+            {
+                jumpOrigin = 0;
+            }
+
+            _rigidbody.AddForce(_jumpforce, ForceMode.Impulse);
+            _rigidbody.AddForce(_forwardForce, ForceMode.Impulse);
+            _animator1.SetTrigger("salta");
+            _animator2.SetTrigger("salta");
+            _animator3.SetTrigger("salta");
+        }
+    }
+
+    public void atacar()
+    {
+        if(isCollidingWithRival)
+        {
+            Vector3 direction = new Vector3(Mathf.Sin(transform.rotation.eulerAngles.y * Mathf.Deg2Rad), 0, Mathf.Cos(transform.rotation.eulerAngles.y * Mathf.Deg2Rad));
+            _animator1.SetTrigger("ataca");
+            _animator2.SetTrigger("ataca");
+            _animator3.SetTrigger("ataca");
+
+            rival.AddForce(direction * _pushForce, ForceMode.Impulse);
+        }
+        
+    }
+
+    private void OnTriggerEnter(Collider collision)
+    {
+        if (collision.gameObject.CompareTag("Rival"))
+        {
+            isCollidingWithRival = true;
+        }
+        if (collision.gameObject.CompareTag("Salt1"))
+        {
+            jumpOrigin = 1;
+        }
+        else if (collision.gameObject.CompareTag("Salt2"))
+        {
+            jumpOrigin = 2;
+        }
+        else if (collision.gameObject.CompareTag("Salt3"))
+        {
+            jumpOrigin = 3;
+        }
+        else if (collision.gameObject.CompareTag("Salt4"))
+        {
+            jumpOrigin = 4;
+        }
+    }
+
+    private void OnTriggerExit(Collider collision)
+    {
+        if (collision.gameObject.CompareTag("Rival"))
+        {
+            isCollidingWithRival = false;
+        }
+    }
+
+    private void OnCollisionExit(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Scene"))
+        {
+            canjump = false;
+        }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Scene"))
+        {
+            canjump = true;
+        }
+    }
+}
