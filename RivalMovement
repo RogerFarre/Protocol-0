@@ -1,0 +1,127 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class RivalMovement : MonoBehaviour
+{
+    [SerializeField] public Rigidbody _rigidbody;
+    [SerializeField] public Animator _animator;
+
+    [SerializeField] private float _moveSpeed;
+    [SerializeField] private float _pushForce;
+    [SerializeField] public Rigidbody rival;
+
+    public float groundDistance = 0f;
+
+    private bool hasCollided = false;
+    private float timer = 0;
+    private float _accio = 3;
+
+    void Update()
+    {
+        if(!hasCollided)
+        {
+            timer += 1 * Time.deltaTime;
+            if(timer>3)
+            {
+                _accio = Random.Range(0, 6);
+            }
+
+            if(_accio == 3)
+            {
+                _animator.SetBool("camina", false);
+            }
+            else
+            {
+                _animator.SetBool("camina", true);
+                GameObject _player = GameObject.Find("PlayerControl");
+                var lookPosition = _player.transform.position - transform.position;
+                lookPosition.y = 0;
+                var _rotation = Quaternion.LookRotation(lookPosition);
+
+                //MOVIMENT DE L'ENEMIC
+                transform.rotation = Quaternion.RotateTowards(transform.rotation, _rotation, 20);
+                transform.Translate(Vector3.forward * _moveSpeed * Time.deltaTime);
+            }
+        }
+    }
+
+    public void atacar()
+    {
+        Vector3 direction = new Vector3(Mathf.Sin(transform.rotation.eulerAngles.y * Mathf.Deg2Rad), 0, Mathf.Cos(transform.rotation.eulerAngles.y * Mathf.Deg2Rad));
+        _animator.SetTrigger("ataca");
+
+        _rigidbody.AddForce(direction * _pushForce, ForceMode.Impulse);
+    }
+
+    private void OnTriggerEnter(Collider collision)
+    {
+        var angle = transform.rotation.eulerAngles.y;
+        angle = (angle + 180) % 360 - 180;
+
+        if (collision.gameObject.CompareTag("Player") && !hasCollided)
+        {
+            hasCollided = true;
+            StartCoroutine(InvokeAtacarAfterDelay(0.3f)); // Temps d'espera abans d'atacar
+        }
+        else if (collision.gameObject.CompareTag("Salt1") && (angle>140 || angle<-120))
+        {
+            print("Salt1");
+            _animator.SetTrigger("salta");
+
+            Vector3 _jumpforce = transform.up;
+            rival.AddForce(_jumpforce * 500, ForceMode.Impulse);
+
+            Vector3 _forwardForce = transform.forward;
+            rival.AddForce(_forwardForce * 700, ForceMode.Impulse);
+        }
+        else if (collision.gameObject.CompareTag("Salt2") && (angle>-45 && angle<60))
+        {
+            print("Salt2");
+            _animator.SetTrigger("salta");
+
+            Vector3 _jumpforce = transform.up;
+            rival.AddForce(_jumpforce * 750, ForceMode.Impulse);
+
+            Vector3 _forwardForce = transform.forward;
+            rival.AddForce(_forwardForce * 470, ForceMode.Impulse);
+        }
+        else if (collision.gameObject.CompareTag("Salt3") && (angle>-90 && angle<-25))
+        {
+            print("Salt3");
+            _animator.SetTrigger("salta");
+
+            Vector3 _jumpforce = transform.up;
+            rival.AddForce(_jumpforce * 500, ForceMode.Impulse);
+
+            Vector3 _forwardForce = transform.forward;
+            rival.AddForce(_forwardForce * 750, ForceMode.Impulse);
+        }
+        else if (collision.gameObject.CompareTag("Salt4") && (angle>110 && angle<170))
+        {
+            print("Salt4");
+            _animator.SetTrigger("salta");
+
+            Vector3 _jumpforce = transform.up;
+            rival.AddForce(_jumpforce * 500, ForceMode.Impulse);
+
+            Vector3 _forwardForce = transform.forward;
+            rival.AddForce(_forwardForce * 580, ForceMode.Impulse);
+        }
+    }
+
+    private IEnumerator InvokeAtacarAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
+        if (hasCollided)
+        {
+            atacar();
+        }
+    }
+
+    private void OnTriggerExit(Collider collision)
+    {
+        hasCollided = false;
+    }
+}
