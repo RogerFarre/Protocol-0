@@ -1,0 +1,57 @@
+using UnityEngine;
+using UnityEngine.UI;
+
+public class ButtonClickHandler : MonoBehaviour
+{
+    public void OnClick1()
+    {
+        ScenesManager scenesManager = GameObject.FindObjectOfType<ScenesManager>();
+        if (scenesManager != null)
+        {
+            scenesManager.SkinChange(1);
+            scenesManager.ChangeScene("Start");
+        }
+    }
+    public void OnClick2()
+    {
+        ScenesManager scenesManager = GameObject.FindObjectOfType<ScenesManager>();
+        if (scenesManager != null)
+        {
+            scenesManager.SkinChange(2);
+            scenesManager.ChangeScene("Start");
+        }
+    }
+    public void OnClick3()
+    {
+        ScenesManager scenesManager = GameObject.FindObjectOfType<ScenesManager>();
+        if (scenesManager != null)
+        {
+            scenesManager.SkinChange(3);
+            scenesManager.ChangeScene("Start");
+        }
+    }
+    public void OnClickSkin()
+    {
+        ScenesManager scenesManager = GameObject.FindObjectOfType<ScenesManager>();
+        if (scenesManager != null)
+        {
+            scenesManager.ChangeScene("Skin");
+        }
+    }
+    public void OnClickGame()
+    {
+        ScenesManager scenesManager = GameObject.FindObjectOfType<ScenesManager>();
+        if (scenesManager != null)
+        {
+            scenesManager.ChangeScene("Game");
+        }
+    }
+    public void OnClickEnd()
+    {
+        ScenesManager scenesManager = GameObject.FindObjectOfType<ScenesManager>();
+        if (scenesManager != null)
+        {
+            scenesManager.ChangeScene("Start");
+        }
+    }
+}
