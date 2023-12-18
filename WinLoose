@@ -1,0 +1,19 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+
+public class WinLoose : MonoBehaviour
+{
+    public void OnTriggerEnter(Collider collision)
+    {
+        if (collision.gameObject.CompareTag("Player"))
+        {
+            SceneManager.LoadScene("Loose");
+        }
+        else if (collision.gameObject.CompareTag("Rival"))
+        {
+            SceneManager.LoadScene("Win");
+        }
+    }
+}
